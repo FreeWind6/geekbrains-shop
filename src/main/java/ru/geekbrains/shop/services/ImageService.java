@@ -35,8 +35,10 @@ public class ImageService {
             if (resource.exists()) {
                 return ImageIO.read(resource.getFile());
             } else {
-                log.error("Image not found!");
-                throw new FileNotFoundException("File " + imageName + " not found!");
+                Resource resource2 = new ClassPathResource("/static/images/error.png");
+                return ImageIO.read(resource2.getFile());
+//                log.error("Image not found!");
+//                throw new FileNotFoundException("File " + imageName + " not found!");
             }
         } catch (MalformedInputException | FileNotFoundException ex) {
             return null;
