@@ -1,0 +1,14 @@
+server:
+  servlet:
+    context-path: /geekshop
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/geekbrains?useUnicode=true&characterEncoding=UTF8
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+  thymeleaf:
+    cache: false
