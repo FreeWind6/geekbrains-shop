@@ -26,6 +26,7 @@ public class ProductController {
     private final ImageService imageService;
     private final ProductService productService;
 
+    @GetMapping("/products/{id}")
     public String getOne(Model model, @PathVariable String id) {
         model.addAttribute("product", productService.getOneById(UUID.fromString(id)));
         return "product";

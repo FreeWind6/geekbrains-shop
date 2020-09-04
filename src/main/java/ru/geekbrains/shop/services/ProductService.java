@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ru.geekbrains.shop.dto.ProductDto;
 import ru.geekbrains.shop.persistence.entities.Product;
+import ru.geekbrains.shop.persistence.entities.enums.ProductCategory;
 import ru.geekbrains.shop.persistence.repositories.ProductRepository;
 
 import java.util.Date;
@@ -27,6 +28,10 @@ public class ProductService {
 
     public List<Product> getAll() {
         return productRepository.findAll();
+    }
+
+    public List<Product> getAllByCategory(ProductCategory category) {
+        return productRepository.findAllByCategory(category);
     }
 
     public String save(ProductDto productDto) {
