@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml" lang="EN">
+<head>
+    <meta charset="utf-8"/>
+    <title>SuperShop</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+
+    <div style="text-align: center;">
+        <h1>Admin Page</h1>
+    </div>
+
+    <div class="container" sec:authorize="hasRole('ADMIN')">
+
+        <form action="#" th:action="@{/products}" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <input type="text" name="title" class="form-control" placeholder="Наименование">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="text" name="description" class="form-control" placeholder="Описание">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="text" name="price" class="form-control" placeholder="Цена">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <select name="category" class="form-control">
+                        <option th:each="category : ${T(ru.geekbrains.shop.persistence.entities.enums.ProductCategory).values()}"
+                                th:value="${category}"
+                                th:text="${category.name}">
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="checkbox" class="form-control" name="available" th:checked="true"/>Продукт доступен
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="file" class="form-control" name="image"/>фото
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">добавить</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Наименование</th>
+            <th>Описание</th>
+            <th>Цена</th>
+            <th>Дата добавления</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product, iterator : ${products}">
+            <!--/*@thymesVar id="product" type="ru.geekbrains.shop.persistence.entities.Product"*/-->
+            <span th:if="${product.available}">
+                            <td th:text="${iterator.index + 1}"></td>
+                            <td>
+                                <a th:href="@{'/products/' + ${product.id}}">[[ ${product.title} ]]</a>
+                            </td>
+                            <td th:text="${product.description}"></td>
+                            <td th:text="${product.price}"></td>
+                            <td th:text="${#dates.format(product.added, 'dd-MM-yyyy')}"></td>
+                        </span>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

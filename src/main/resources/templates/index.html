@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="EN">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      lang="EN">
     <head>
         <meta charset="utf-8"/>
         <title>SuperShop</title>
@@ -11,6 +12,39 @@
             <div style="text-align: center;">
                 <h1>GeekBrains Shop</h1>
             </div>
+
+            <div class="container" sec:authorize="isAuthenticated()">
+                <div class="row">
+                    <div class="col-sm">
+                        <a class="nav-link" th:href="@{/profile}" th:text="Profile">PROFILE</a>
+                    </div>
+                    <div class="col-sm">
+                        <form th:action="@{/logout}" method="POST" class="form-inline">
+                            <button id="navLogout" class="btn btn-outline-secondary" type="submit"  th:text="logout"></button>
+                        </form>
+                    </div>
+                    <div class="col-sm">
+                        <a class="nav-link" th:href="@{/cart}" th:text="CART">CART</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container" sec:authorize="isAnonymous()">
+                <form th:action="@{/authenticateTheUser}" method="POST" class="form-inline">
+                    <div class="row" style="margin-left: auto;margin-right: auto;">
+                        <div class="col-sm">
+                            <input type="text" name="username" placeholder="username" class="form-control">
+                        </div>
+                        <div class="col-sm">
+                            <input type="password" name="password" placeholder="password" class="form-control">
+                        </div>
+                        <div class="col-sm">
+                            <button type="submit" class="btn btn-success">вход</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <br>
 
             <table class="table table-hover">
                 <thead class="thead-dark">
@@ -39,6 +73,13 @@
                         <td th:text="${product.description}"/>
                         <td th:text="${product.price}"/>
                         <td th:text="${#dates.format(product.added, 'dd-MM-yyyy')}"/>
+                        <td>
+                            <div sec:authorize="isAuthenticated()">
+                                <a th:href="@{'/cart/add/' + ${product.id}}">
+                                    <img th:src="@{'/images/cart.png'}" alt="" width="30px" height="30px" />
+                                </a>
+                            </div>
+                        </td>
                     </span>
                 </tr>
                 </tbody>
@@ -55,6 +96,9 @@
                 </select>
                 <button type="submit">применить</button>
             </form>
+            <div class="col-sm">
+                <a sec:authorize="hasRole('ADMIN')" class="nav-link" th:href="@{/admin}" th:text="admin">ADMIN</a>
+            </div>
         </div>
     </body>
 </html>

@@ -26,12 +26,8 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
-    }
-
-    public List<Product> getAllByCategory(ProductCategory category) {
-        return productRepository.findAllByCategory(category);
+    public List<Product> getAll(Integer category) {
+        return category == null ? productRepository.findAll() : productRepository.findAllByCategory(ProductCategory.values()[category]);
     }
 
     public String save(ProductDto productDto) {

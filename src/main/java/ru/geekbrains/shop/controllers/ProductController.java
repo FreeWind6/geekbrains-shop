@@ -2,6 +2,7 @@ package ru.geekbrains.shop.controllers;
 
 import lombok.RequiredArgsConstructor;
 
+import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,12 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import ru.geekbrains.shop.persistence.entities.Product;
 import ru.geekbrains.shop.services.ImageService;
 import ru.geekbrains.shop.services.ProductService;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -26,9 +29,11 @@ public class ProductController {
     private final ImageService imageService;
     private final ProductService productService;
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/{id}")
     public String getOne(Model model, @PathVariable String id) {
-        model.addAttribute("product", productService.getOneById(UUID.fromString(id)));
+        productService.getOneById(UUID.fromString(id)).ifPresent(
+            product -> model.addAttribute("product", product)
+        );
         return "product";
     }
 
