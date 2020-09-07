@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
 import ru.geekbrains.shop.persistence.entities.Image;
@@ -31,7 +32,8 @@ public class ImageService {
     public BufferedImage loadFileAsResource(String id) throws IOException {
         try {
             String imageName = getImageForSpecificProduct(UUID.fromString(id));
-            Resource resource = new ClassPathResource("/static/images/" + imageName);
+//            Resource resource = new ClassPathResource("/static/images/" + imageName);
+            UrlResource resource = new UrlResource("file:C:\\Users\\Dmitry\\IdeaProjects\\image\\" + imageName);
             if (resource.exists()) {
                 return ImageIO.read(resource.getFile());
             } else {
