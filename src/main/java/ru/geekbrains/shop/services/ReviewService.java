@@ -10,11 +10,12 @@ import ru.geekbrains.shop.persistence.entities.Shopuser;
 import ru.geekbrains.shop.persistence.repositories.ReviewRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-
 
     private final ReviewRepository reviewRepository;
 
@@ -28,6 +29,18 @@ public class ReviewService {
 
     public void save(Review review) {
         reviewRepository.save(review);
+    }
+
+    public UUID moderate(UUID id, String option) {
+        Optional<Review> reviewOptional = reviewRepository.findById(id);
+        if(reviewOptional.isPresent()) {
+            Review review = reviewOptional.get();
+            review.setApproved(option.equals("approve"));
+            save(review);
+            return review.getProduct().getId();
+        } else {
+            return null;
+        }
     }
 
 }

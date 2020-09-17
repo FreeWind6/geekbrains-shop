@@ -22,6 +22,7 @@ import ru.geekbrains.shop.persistence.entities.Image;
 import ru.geekbrains.shop.persistence.entities.Product;
 import ru.geekbrains.shop.persistence.entities.Review;
 import ru.geekbrains.shop.persistence.entities.Shopuser;
+import ru.geekbrains.shop.persistence.entities.enums.Role;
 import ru.geekbrains.shop.services.ImageService;
 import ru.geekbrains.shop.services.ProductService;
 import ru.geekbrains.shop.services.ReviewService;
@@ -96,6 +97,7 @@ public class ProductController {
                 .commentary(reviewDto.getCommentary())
                 .product(product)
                 .shopuser(shopuserOptional.get())
+                .approved(shopuserOptional.get().getRole().equals(Role.ROLE_ADMIN))
             .build();
 
             reviewService.save(review);
