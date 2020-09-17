@@ -24,6 +24,10 @@ public class ShopuserService implements UserDetailsService {
 
     private final ShopuserRepository shopuserRepository;
 
+    public Optional<Shopuser> findByPhone(String phone) {
+        return shopuserRepository.findByPhone(phone);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Shopuser shopuser;

@@ -2,28 +2,40 @@ package ru.geekbrains.shop.controllers;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.SneakyThrows;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import ru.geekbrains.shop.dto.ProductDto;
+import ru.geekbrains.shop.dto.ReviewDto;
+import ru.geekbrains.shop.exceptions.ProductNotFoundException;
+import ru.geekbrains.shop.persistence.entities.Image;
 import ru.geekbrains.shop.persistence.entities.Product;
+import ru.geekbrains.shop.persistence.entities.Review;
+import ru.geekbrains.shop.persistence.entities.Shopuser;
 import ru.geekbrains.shop.services.ImageService;
 import ru.geekbrains.shop.services.ProductService;
+import ru.geekbrains.shop.services.ReviewService;
+import ru.geekbrains.shop.services.ShopuserService;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
+
+import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,49 +46,65 @@ public class ProductController {
 
     private final ImageService imageService;
     private final ProductService productService;
+    private final ReviewService reviewService;
+    private final ShopuserService shopuserService;
 
     @GetMapping("/{id}")
     public String getOne(Model model, @PathVariable String id) {
-        productService.getOneById(UUID.fromString(id)).ifPresent(
-                product -> model.addAttribute("product", product)
-        );
+
+        Optional<Product> productOptional = productService.getOneById(UUID.fromString(id));
+
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            List<Review> reviews = reviewService.getReviewsByProduct(product);
+            model.addAttribute("product", product);
+            model.addAttribute("reviews", reviews);
+        }
+
         return "product";
     }
 
     @GetMapping(value = "/images/{id}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody
-    byte[] getImage(@PathVariable String id) {
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(imageService.loadFileAsResource(id), "png", byteArrayOutputStream);
-            // FIXME загружает jpg и так хорошо, без строки ниже
-//            ImageIO.write(imageService.loadFileAsResource(id), "jpg", byteArrayOutputStream);
+    public @ResponseBody byte[] getImage(@PathVariable String id) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BufferedImage bufferedImage = imageService.loadFileAsResource(id);
+        if (bufferedImage != null) {
+            ImageIO.write(bufferedImage,"png", byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
-        } catch (IOException ex) {
-            throw new RuntimeException("Формат не корректен");
+        } else {
+            return new byte[0];
         }
     }
 
-    //TODO доделать
-    @RequestMapping(value = "/add/image", method = RequestMethod.POST)
-    public ResponseEntity upload(@RequestParam("id") Long id, HttpServletRequest request) {
-        try {
-            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-            Iterator<String> it = multipartRequest.getFileNames();
-            MultipartFile multipart = multipartRequest.getFile(it.next());
-            String fileName = id + ".png";
+    @PostMapping
+    public String addOne(@RequestParam("image") MultipartFile image, ProductDto productDto) throws IOException {
+        Image img = imageService.uploadImage(image, productDto.getTitle());
+        return productService.save(productDto, img);
+    }
 
-            byte[] bytes = multipart.getBytes();
-            BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream("src/main/resources/static/image/book/" + fileName));
+    @PostMapping("/reviews")
+    public String addReview(ReviewDto reviewDto, HttpSession httpSession, Principal principal) {
 
-            stream.write(bytes);
-            stream.close();
-            return new ResponseEntity("upload success", HttpStatus.OK);
+        Optional<Product> productOptional = productService.getOneById(reviewDto.getProductId());
+        Optional<Shopuser> shopuserOptional = shopuserService.findByPhone(principal.getName());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity("Upload filed", HttpStatus.BAD_REQUEST);
+        Product product;
+
+        if (productOptional.isPresent() && shopuserOptional.isPresent()) {
+            product = productOptional.get();
+            Review review = Review.builder()
+                .commentary(reviewDto.getCommentary())
+                .product(product)
+                .shopuser(shopuserOptional.get())
+            .build();
+
+            reviewService.save(review);
+
+            return "redirect:/products/" + product.getId();
         }
+
+        return "redirect:/";
+
     }
 
 }

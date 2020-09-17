@@ -5,10 +5,14 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres?useUnicode=true&characterEncoding=UTF8
+    url: jdbc:postgresql://localhost:5432/geekbrains?useUnicode=true&characterEncoding=UTF8
     username: postgres
-    password: root
+    password: postgres
   jpa:
     show-sql: true
   thymeleaf:
     cache: false
+files:
+  storepath:
+    icons:  "//Users//ruaadv7//Documents//GeekBrains//uploads//icons"
+    images: "//Users//ruaadv7//Documents//GeekBrains//uploads//images"

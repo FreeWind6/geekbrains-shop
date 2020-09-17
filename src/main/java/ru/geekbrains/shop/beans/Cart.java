@@ -27,7 +27,6 @@ public class Cart {
     @PostConstruct
     public void init() {
         cartRecords = new ArrayList<>();
-        recalculatePrice();
     }
 
     public void clear() {
@@ -45,6 +44,7 @@ public class Cart {
             }
         }
         cartRecords.add(new CartRecord(product));
+        recalculatePrice();
     }
 
     public void removeByProductId(UUID productId) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="EN">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="EN">
     <head>
         <meta charset="utf-8"/>
         <title>SuperShop</title>
@@ -10,6 +10,70 @@
     <body>
         <div class="container">
             <h1>Product [[ ${product.title} ]]</h1>
+        </div>
+
+        <hr>
+        <h2 style="text-align: center"> Отзывы о продукте</h2>
+        <div class="container">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Текст отзыва</th>
+                    <th>Пользователь</th>
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <th>Опции</th>
+                    </div>
+                </tr>
+                </thead>
+                <tbody th:if="${reviews.size() > 0}">
+                <tr th:each="review, iterator : ${reviews}">
+                    <!--/*@thymesVar id="review" type="ru.geekbrains.shop.persistence.entities.Review"*/-->
+                    <td th:text="${iterator.index + 1}"></td>
+                    <div sec:authorize="!hasRole('ADMIN')">
+                        <td th:text="${review.approved} ? ${review.commentary} : 'Комментарий на модерации!'"}
+                            th:style="${review.approved ? 'color:black' : 'color:#c1c1c1'}">
+                        </td>
+                    </div>
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <td th:text="${review.commentary}"}></td>
+                    </div>
+                    <td>
+                        <a th:href="@{'/profile/' + ${review.shopuser.id}}">[[ ${review.shopuser.firstName} ]]</a>
+                    </td>
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <td th:unless="${review.approved}">
+                            <a th:href="@{'/reviews/' + ${review.id} + '/?option=approve'}" class="btn btn-warning">Одобрить</a>
+                        </td>
+                        <td th:if="${review.approved}">
+                            <a th:href="@{'/reviews/' + ${review.id} + '/?option=decline'}" class="btn btn-danger">Отклонить</a>
+                        </td>
+                    </div>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="container" style="text-align: center" sec:authorize="isAuthenticated()">
+            <form action="#" th:action="@{/products/reviews}" method="POST">
+                <div class="form-row row justify-content-center">
+                    <div class="form-group col-md-9">
+                        <textarea class="form-control" name="commentary" rows="5" style="resize: none;" placeholder="Введите ваш отзыв"></textarea>
+                    </div>
+                </div>
+                <div class="form-row row justify-content-center">
+                    <div class="form-group col-md-3">
+                        <img class="captcha-pic" id="captcha" th:src="@{/captcha}" />
+                    </div>
+                    <div class="form-group col-md-3">
+                        <input type="text" name="captchaCode" class="form-control" placeholder="Введите проверочный код">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <button type="submit" class="btn btn-success">оставить отзыв</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </body>
 </html>

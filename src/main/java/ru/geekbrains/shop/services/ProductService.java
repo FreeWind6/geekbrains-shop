@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import ru.geekbrains.shop.dto.ProductDto;
+import ru.geekbrains.shop.persistence.entities.Image;
 import ru.geekbrains.shop.persistence.entities.Product;
 import ru.geekbrains.shop.persistence.entities.enums.ProductCategory;
 import ru.geekbrains.shop.persistence.repositories.ProductRepository;
@@ -30,7 +31,7 @@ public class ProductService {
         return category == null ? productRepository.findAll() : productRepository.findAllByCategory(ProductCategory.values()[category]);
     }
 
-    public String save(ProductDto productDto) {
+    public String save(ProductDto productDto, Image image) {
 
         Product product = Product.builder()
             .added(new Date())
@@ -38,6 +39,8 @@ public class ProductService {
             .available(productDto.isAvailable())
             .category(productDto.getCategory())
             .price(productDto.getPrice())
+            .description(productDto.getDescription())
+            .image(image)
         .build();
 
         productRepository.save(product);
