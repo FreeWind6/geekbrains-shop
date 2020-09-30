@@ -1,0 +1,16 @@
+jib {
+    from {
+        image = "openjdk:11-jdk"
+    }
+    to {
+        image = 'localhost:5000/geekshop/demo'
+        tags = ['0.0.1']
+    }
+    container {
+        jvmFlags = ['-Xms1024m', '-Xdebug']
+        mainClass = "ru.geekbrains.shop.ShopApplication"
+        ports = ['8080/tcp']
+    }
+}
+
+jib.to.image = "serpentcross/${rootProject.name}"

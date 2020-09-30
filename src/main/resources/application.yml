@@ -10,9 +10,20 @@ spring:
     password: postgres
   jpa:
     show-sql: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   thymeleaf:
     cache: false
 files:
   storepath:
     icons:  "//Users//ruaadv7//Documents//GeekBrains//uploads//icons"
     images: "//Users//ruaadv7//Documents//GeekBrains//uploads//images"
+
+geekshop:
+  rabbitmq:
+    exchange: super-shop.exchange
+    routingkey: super.shop
+    queue: super-shop.queue

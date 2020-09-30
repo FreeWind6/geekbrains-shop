@@ -2,6 +2,7 @@ package ru.geekbrains.shop.controllers;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,6 +50,8 @@ public class ProductController {
     private final ProductService productService;
     private final ReviewService reviewService;
     private final ShopuserService shopuserService;
+
+    private final AmqpTemplate amqpTemplate;
 
     @GetMapping("/{id}")
     public String getOne(Model model, @PathVariable String id) {
@@ -99,6 +102,8 @@ public class ProductController {
                 .shopuser(shopuserOptional.get())
                 .approved(shopuserOptional.get().getRole().equals(Role.ROLE_ADMIN))
             .build();
+
+            amqpTemplate.convertAndSend("super-shop.exchange","super.shop","User has left review");
 
             reviewService.save(review);
 

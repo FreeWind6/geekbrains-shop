@@ -7,8 +7,10 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import ru.geekbrains.paymentservice.Payment;
 import ru.geekbrains.shop.persistence.entities.CartRecord;
 import ru.geekbrains.shop.persistence.entities.Product;
+import ru.geekbrains.shop.services.soap.PaymentService;
 
 import javax.annotation.PostConstruct;
 
@@ -22,11 +24,15 @@ import java.util.UUID;
 public class Cart {
 
     private List<CartRecord> cartRecords;
+    private List<Payment> payments;
     private Double price;
+
+    private final PaymentService paymentService;
 
     @PostConstruct
     public void init() {
         cartRecords = new ArrayList<>();
+        payments = paymentService.getPayments("Russia");
     }
 
     public void clear() {
